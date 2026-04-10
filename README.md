@@ -1,3 +1,9 @@
+## Installer Runtime Note
+
+The installer now streams the embedded payload directly into the target work directory and no longer writes an extra `/tmp/prometheus-stack-installer/payload.tar.gz` copy during install.
+
+During installation it is normal to see `/tmp/prometheus-stack-installer/images` grow as image archives are unpacked for `docker load`; that growth is the real payload extraction, not a duplicated archive file.
+
 # app_prometheus-stack
 
 面向 Kubernetes 的 Prometheus/Grafana/Alertmanager 离线交付仓库。

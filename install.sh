@@ -3,10 +3,9 @@
 set -Eeuo pipefail
 
 APP_NAME="prometheus-stack"
-APP_VERSION="0.1.1"
+APP_VERSION="0.1.2"
 PACKAGE_PROFILE="integrated"
 WORKDIR="/tmp/${APP_NAME}-installer"
-PAYLOAD_ARCHIVE="${WORKDIR}/payload.tar.gz"
 CHART_DIR="${WORKDIR}/charts/kube-prometheus-stack"
 IMAGE_DIR="${WORKDIR}/images"
 IMAGE_INDEX="${IMAGE_DIR}/image-index.tsv"
@@ -438,7 +437,7 @@ extract_payload() {
   rm -rf "${WORKDIR}"
   mkdir -p "${WORKDIR}"
 
-  payload_stream | tee "${PAYLOAD_ARCHIVE}" | tar -xzf - -C "${WORKDIR}" >/dev/null
+  payload_stream | tar -xzf - -C "${WORKDIR}" >/dev/null
 
   [[ -d "${CHART_DIR}" ]] || die "Missing chart payload"
   [[ -f "${IMAGE_INDEX}" ]] || die "Missing image metadata payload"
