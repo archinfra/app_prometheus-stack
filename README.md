@@ -1,8 +1,10 @@
 ## Installer Runtime Note
 
-The installer now streams the embedded payload directly into the target work directory and no longer writes an extra `/tmp/prometheus-stack-installer/payload.tar.gz` copy during install.
+The installer now streams the embedded payload directly into the target work directory with `tail -c`, instead of the previous byte-by-byte `dd bs=1` path, and no longer writes an extra `/tmp/prometheus-stack-installer/payload.tar.gz` copy during install.
 
 During installation it is normal to see `/tmp/prometheus-stack-installer/images` grow as image archives are unpacked for `docker load`; that growth is the real payload extraction, not a duplicated archive file.
+
+If you use `--skip-image-prepare`, the installer now only extracts chart files plus image metadata and skips unpacking the embedded image archives entirely.
 
 # app_prometheus-stack
 

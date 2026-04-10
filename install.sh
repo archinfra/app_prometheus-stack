@@ -3,7 +3,7 @@
 set -Eeuo pipefail
 
 APP_NAME="prometheus-stack"
-APP_VERSION="0.1.2"
+APP_VERSION="0.1.3"
 PACKAGE_PROFILE="integrated"
 WORKDIR="/tmp/${APP_NAME}-installer"
 CHART_DIR="${WORKDIR}/charts/kube-prometheus-stack"
@@ -429,7 +429,14 @@ init_payload_offset() {
 
 payload_stream() {
   init_payload_offset
-  dd if="$0" bs=1 skip="$((PAYLOAD_OFFSET - 1))" 2>/dev/null
+  tail -c +"${PAYLOAD_OFFSET}" "$0"
+}
+
+payload_extract_entries() {
+  local destination="$1"
+  shift
+
+  payload_stream | tar -xzf - -C "${destination}" "$@" >/dev/null
 }
 
 extract_payload() {
@@ -437,7 +444,11 @@ extract_payload() {
   rm -rf "${WORKDIR}"
   mkdir -p "${WORKDIR}"
 
-  payload_stream | tar -xzf - -C "${WORKDIR}" >/dev/null
+  if [[ "${SKIP_IMAGE_PREPARE}" == "true" ]]; then
+    payload_extract_entries "${WORKDIR}" "./charts" "./images/image-index.tsv"
+  else
+    payload_stream | tar -xzf - -C "${WORKDIR}" >/dev/null
+  fi
 
   [[ -d "${CHART_DIR}" ]] || die "Missing chart payload"
   [[ -f "${IMAGE_INDEX}" ]] || die "Missing image metadata payload"
