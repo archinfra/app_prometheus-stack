@@ -3,7 +3,7 @@
 set -Eeuo pipefail
 
 APP_NAME="prometheus-stack"
-APP_VERSION="0.1.0"
+APP_VERSION="0.1.1"
 PACKAGE_PROFILE="integrated"
 WORKDIR="/tmp/${APP_NAME}-installer"
 PAYLOAD_ARCHIVE="${WORKDIR}/payload.tar.gz"
@@ -36,6 +36,15 @@ ALERTMANAGER_STORAGE_SIZE="10Gi"
 GRAFANA_STORAGE_CLASS="nfs"
 GRAFANA_STORAGE_SIZE="10Gi"
 GRAFANA_ADMIN_PASSWORD="admin@passw0rd"
+GRAFANA_SERVICE_TYPE="NodePort"
+GRAFANA_NODE_PORT="30090"
+PROMETHEUS_SERVICE_TYPE="NodePort"
+PROMETHEUS_NODE_PORT="30091"
+ALERTMANAGER_CONFIG_FILE=""
+
+DASHBOARD_LABEL_KEY="grafana_dashboard"
+DASHBOARD_LABEL_VALUE="1"
+DASHBOARD_FOLDER_ANNOTATION="grafana_folder"
 
 STACK_LABEL_KEY="monitoring.archinfra.io/stack"
 STACK_LABEL_VALUE="default"
@@ -122,11 +131,16 @@ Storage and runtime:
   --prometheus-storage-size <size>          Default: ${PROMETHEUS_STORAGE_SIZE}
   --prometheus-retention <duration>         Default: ${PROMETHEUS_RETENTION}
   --prometheus-retention-size <size>        Default: ${PROMETHEUS_RETENTION_SIZE}
+  --prometheus-service-type <type>          ClusterIP|NodePort|LoadBalancer, default: ${PROMETHEUS_SERVICE_TYPE}
+  --prometheus-node-port <port>             Used when Prometheus service is NodePort, default: ${PROMETHEUS_NODE_PORT}
   --alertmanager-storage-class <name>       Default: ${ALERTMANAGER_STORAGE_CLASS}
   --alertmanager-storage-size <size>        Default: ${ALERTMANAGER_STORAGE_SIZE}
+  --alertmanager-config-file <path>         Optional Alertmanager config YAML for real notifications
   --grafana-storage-class <name>            Default: ${GRAFANA_STORAGE_CLASS}
   --grafana-storage-size <size>             Default: ${GRAFANA_STORAGE_SIZE}
   --grafana-admin-password <password>       Default: ${GRAFANA_ADMIN_PASSWORD}
+  --grafana-service-type <type>             ClusterIP|NodePort|LoadBalancer, default: ${GRAFANA_SERVICE_TYPE}
+  --grafana-node-port <port>                Used when Grafana service is NodePort, default: ${GRAFANA_NODE_PORT}
 
 Image and registry:
   --registry <repo-prefix>                  Target image repo prefix, default: ${REGISTRY_REPO}
@@ -144,6 +158,8 @@ Other:
 
 Examples:
   ${cmd} install -n monitoring --grafana-admin-password 'Admin@123' -y
+  ${cmd} install --grafana-node-port 30090 --prometheus-node-port 30091 -y
+  ${cmd} install --alertmanager-config-file ./examples/alertmanager-config-webhook.yaml -y
   ${cmd} install --registry harbor.example.com/kube4 --skip-image-prepare -y
   ${cmd} status -n monitoring
   ${cmd} uninstall -n monitoring --delete-crds -y
@@ -198,6 +214,16 @@ parse_args() {
         PROMETHEUS_RETENTION_SIZE="$2"
         shift 2
         ;;
+      --prometheus-service-type)
+        [[ $# -ge 2 ]] || die "Missing value for $1"
+        PROMETHEUS_SERVICE_TYPE="$2"
+        shift 2
+        ;;
+      --prometheus-node-port)
+        [[ $# -ge 2 ]] || die "Missing value for $1"
+        PROMETHEUS_NODE_PORT="$2"
+        shift 2
+        ;;
       --alertmanager-storage-class)
         [[ $# -ge 2 ]] || die "Missing value for $1"
         ALERTMANAGER_STORAGE_CLASS="$2"
@@ -206,6 +232,11 @@ parse_args() {
       --alertmanager-storage-size)
         [[ $# -ge 2 ]] || die "Missing value for $1"
         ALERTMANAGER_STORAGE_SIZE="$2"
+        shift 2
+        ;;
+      --alertmanager-config-file)
+        [[ $# -ge 2 ]] || die "Missing value for $1"
+        ALERTMANAGER_CONFIG_FILE="$2"
         shift 2
         ;;
       --grafana-storage-class)
@@ -221,6 +252,16 @@ parse_args() {
       --grafana-admin-password)
         [[ $# -ge 2 ]] || die "Missing value for $1"
         GRAFANA_ADMIN_PASSWORD="$2"
+        shift 2
+        ;;
+      --grafana-service-type)
+        [[ $# -ge 2 ]] || die "Missing value for $1"
+        GRAFANA_SERVICE_TYPE="$2"
+        shift 2
+        ;;
+      --grafana-node-port)
+        [[ $# -ge 2 ]] || die "Missing value for $1"
+        GRAFANA_NODE_PORT="$2"
         shift 2
         ;;
       --registry)
@@ -287,6 +328,30 @@ normalize_flags() {
       die "Unsupported image pull policy: ${IMAGE_PULL_POLICY}"
       ;;
   esac
+
+  case "${PROMETHEUS_SERVICE_TYPE}" in
+    ClusterIP|NodePort|LoadBalancer) ;;
+    *)
+      die "Unsupported prometheus service type: ${PROMETHEUS_SERVICE_TYPE}"
+      ;;
+  esac
+
+  case "${GRAFANA_SERVICE_TYPE}" in
+    ClusterIP|NodePort|LoadBalancer) ;;
+    *)
+      die "Unsupported grafana service type: ${GRAFANA_SERVICE_TYPE}"
+      ;;
+  esac
+
+  if [[ "${PROMETHEUS_SERVICE_TYPE}" == "NodePort" ]]; then
+    [[ "${PROMETHEUS_NODE_PORT}" =~ ^[0-9]+$ ]] || die "Prometheus nodePort must be numeric"
+    (( PROMETHEUS_NODE_PORT >= 30000 && PROMETHEUS_NODE_PORT <= 32767 )) || die "Prometheus nodePort must be within 30000-32767"
+  fi
+
+  if [[ "${GRAFANA_SERVICE_TYPE}" == "NodePort" ]]; then
+    [[ "${GRAFANA_NODE_PORT}" =~ ^[0-9]+$ ]] || die "Grafana nodePort must be numeric"
+    (( GRAFANA_NODE_PORT >= 30000 && GRAFANA_NODE_PORT <= 32767 )) || die "Grafana nodePort must be within 30000-32767"
+  fi
 }
 
 check_deps() {
@@ -294,6 +359,9 @@ check_deps() {
   command -v kubectl >/dev/null 2>&1 || die "kubectl is required"
   if [[ "${ACTION}" == "install" && "${SKIP_IMAGE_PREPARE}" != "true" ]]; then
     command -v docker >/dev/null 2>&1 || die "docker is required unless --skip-image-prepare is used"
+  fi
+  if [[ -n "${ALERTMANAGER_CONFIG_FILE}" && ! -f "${ALERTMANAGER_CONFIG_FILE}" ]]; then
+    die "Alertmanager config file not found: ${ALERTMANAGER_CONFIG_FILE}"
   fi
 }
 
@@ -309,10 +377,15 @@ confirm() {
     echo "Prometheus storage        : ${PROMETHEUS_STORAGE_SIZE}"
     echo "Prometheus retention      : ${PROMETHEUS_RETENTION}"
     echo "Prometheus retention size : ${PROMETHEUS_RETENTION_SIZE}"
+    echo "Prometheus service type   : ${PROMETHEUS_SERVICE_TYPE}"
+    echo "Prometheus nodePort       : ${PROMETHEUS_NODE_PORT}"
     echo "Alertmanager storageClass : ${ALERTMANAGER_STORAGE_CLASS}"
     echo "Alertmanager storage      : ${ALERTMANAGER_STORAGE_SIZE}"
+    echo "Alertmanager config file  : ${ALERTMANAGER_CONFIG_FILE:-<default-null-receiver>}"
     echo "Grafana storageClass      : ${GRAFANA_STORAGE_CLASS}"
     echo "Grafana storage           : ${GRAFANA_STORAGE_SIZE}"
+    echo "Grafana service type      : ${GRAFANA_SERVICE_TYPE}"
+    echo "Grafana nodePort          : ${GRAFANA_NODE_PORT}"
     echo "Registry repo             : ${REGISTRY_REPO}"
     echo "Skip image prepare        : ${SKIP_IMAGE_PREPARE}"
     echo "Wait timeout              : ${WAIT_TIMEOUT}"
@@ -570,9 +643,17 @@ alertmanager:
   serviceMonitor:
     additionalLabels:
       "${STACK_LABEL_KEY}": "${STACK_LABEL_VALUE}"
+$(if [[ -n "${ALERTMANAGER_CONFIG_FILE}" ]]; then
+  printf '  tplConfig: false\n'
+  printf '  stringConfig: |-\n'
+  sed 's/^/    /' "${ALERTMANAGER_CONFIG_FILE}"
+fi)
 
 prometheus:
   enabled: true
+  service:
+    type: "${PROMETHEUS_SERVICE_TYPE}"
+    nodePort: ${PROMETHEUS_NODE_PORT}
   serviceMonitor:
     additionalLabels:
       "${STACK_LABEL_KEY}": "${STACK_LABEL_VALUE}"
@@ -624,6 +705,7 @@ prometheus:
 
 grafana:
   enabled: true
+  forceDeployDashboards: true
   adminPassword: '$(yaml_single_quote "${GRAFANA_ADMIN_PASSWORD}")'
   extraLabels:
     "${STACK_LABEL_KEY}": "${STACK_LABEL_VALUE}"
@@ -651,6 +733,20 @@ grafana:
       repository: $(image_repository_from_ref "${K8S_SIDECAR_IMAGE}")
       tag: "$(image_tag_from_ref "${K8S_SIDECAR_IMAGE}")"
       sha: ""
+    dashboards:
+      enabled: true
+      label: "${DASHBOARD_LABEL_KEY}"
+      labelValue: "${DASHBOARD_LABEL_VALUE}"
+      searchNamespace: ALL
+      folderAnnotation: "${DASHBOARD_FOLDER_ANNOTATION}"
+      provider:
+        allowUiUpdates: false
+    datasources:
+      enabled: true
+      defaultDatasourceEnabled: true
+      isDefaultDatasource: true
+      alertmanager:
+        enabled: true
   imageRenderer:
     image:
       registry: $(image_registry_from_ref "${GRAFANA_RENDERER_IMAGE}")
@@ -666,7 +762,13 @@ grafana:
     type: pvc
     size: "${GRAFANA_STORAGE_SIZE}"
     storageClassName: "${GRAFANA_STORAGE_CLASS}"
+  service:
+    type: "${GRAFANA_SERVICE_TYPE}"
+    nodePort: ${GRAFANA_NODE_PORT}
+    labels:
+      "${STACK_LABEL_KEY}": "${STACK_LABEL_VALUE}"
   serviceMonitor:
+    enabled: true
     labels:
       "${STACK_LABEL_KEY}": "${STACK_LABEL_VALUE}"
 
@@ -882,6 +984,24 @@ show_post_install_info() {
     echo
     kubectl get servicemonitor,podmonitor,prometheusrule,prometheus,alertmanager -n "${NAMESPACE}" -l "app.kubernetes.io/instance=${RELEASE_NAME}" || true
   fi
+
+  section "Access Information"
+  if [[ "${GRAFANA_SERVICE_TYPE}" == "NodePort" ]]; then
+    echo "Grafana URL              : http://<any-node-ip>:${GRAFANA_NODE_PORT}"
+  fi
+  if [[ "${PROMETHEUS_SERVICE_TYPE}" == "NodePort" ]]; then
+    echo "Prometheus URL           : http://<any-node-ip>:${PROMETHEUS_NODE_PORT}"
+  fi
+  echo "Grafana admin user       : admin"
+  echo "Grafana admin password   : ${GRAFANA_ADMIN_PASSWORD}"
+  if [[ -n "${ALERTMANAGER_CONFIG_FILE}" ]]; then
+    echo "Alert notifications      : custom config loaded from ${ALERTMANAGER_CONFIG_FILE}"
+  else
+    echo "Alert notifications      : default null receiver, provide --alertmanager-config-file to enable real notifications"
+  fi
+  echo "Dashboard label contract : ${DASHBOARD_LABEL_KEY}=${DASHBOARD_LABEL_VALUE}"
+  echo "Dashboard folder anno    : ${DASHBOARD_FOLDER_ANNOTATION}"
+  echo "Monitor label contract   : ${STACK_LABEL_KEY}=${STACK_LABEL_VALUE}"
 }
 
 delete_crds_if_requested() {

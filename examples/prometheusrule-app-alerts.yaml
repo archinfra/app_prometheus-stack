@@ -1,0 +1,22 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: example-app-rules
+  namespace: default
+  labels:
+    monitoring.archinfra.io/stack: default
+spec:
+  groups:
+    - name: example-app.rules
+      rules:
+        - alert: ExampleAppDown
+          expr: up{job="example-app"} == 0
+          for: 2m
+          labels:
+            severity: warning
+            component: example-app
+          annotations:
+            summary: Example app target is down
+            description: Prometheus cannot scrape the example app target for 2 minutes.
+        - record: job:example_app_up:sum
+          expr: sum(up{job="example-app"})

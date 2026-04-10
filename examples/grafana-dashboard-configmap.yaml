@@ -1,0 +1,55 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: example-app-dashboard
+  namespace: default
+  labels:
+    grafana_dashboard: "1"
+    monitoring.archinfra.io/stack: default
+  annotations:
+    grafana_folder: Middleware/Examples
+data:
+  example-app-overview.json: |
+    {
+      "annotations": {
+        "list": []
+      },
+      "editable": true,
+      "panels": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "title": "Example App Up",
+          "type": "stat",
+          "targets": [
+            {
+              "expr": "sum(up{job=\"example-app\"})",
+              "refId": "A"
+            }
+          ],
+          "gridPos": {
+            "h": 6,
+            "w": 8,
+            "x": 0,
+            "y": 0
+          }
+        }
+      ],
+      "schemaVersion": 39,
+      "style": "dark",
+      "tags": [
+        "archinfra",
+        "example"
+      ],
+      "templating": {
+        "list": []
+      },
+      "time": {
+        "from": "now-1h",
+        "to": "now"
+      },
+      "title": "Example App Overview",
+      "version": 1
+    }

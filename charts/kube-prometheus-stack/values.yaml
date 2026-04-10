@@ -409,7 +409,7 @@ alertmanager:
 
   ## Create dashboard configmap even if alertmanager deployment has been disabled
   ##
-  forceDeployDashboards: false
+  forceDeployDashboards: true
 
   ## Network Policy configuration
   ##
@@ -1389,6 +1389,7 @@ grafana:
       labelValue: "1"
       # Allow discovery in all namespaces for dashboards
       searchNamespace: ALL
+      folderAnnotation: grafana_folder
 
       # Support for new table panels, when enabled grafana auto migrates the old table panels to newer table panels
       enableNewTablePanelSyntax: false
@@ -3592,7 +3593,7 @@ prometheus:
     ## Port to expose on each node
     ## Only used if service.type is 'NodePort'
     ##
-    nodePort: 30090
+    nodePort: 30091
 
     ## Loadbalancer IP
     ## Only use if service.type is "LoadBalancer"
@@ -3605,7 +3606,7 @@ prometheus:
 
     ## Service type
     ##
-    type: ClusterIP
+    type: NodePort
 
     ## Additional ports to open for Prometheus service
     ##
