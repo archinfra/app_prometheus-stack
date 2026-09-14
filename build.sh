@@ -3,6 +3,9 @@
 set -Eeuo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck disable=SC1091
+source "${ROOT_DIR}/versions.env"
+
 TEMP_DIR="${ROOT_DIR}/.build-payload"
 PAYLOAD_DIR="${TEMP_DIR}/payload"
 PAYLOAD_FILE="${TEMP_DIR}/payload.tar.gz"
@@ -11,7 +14,7 @@ IMAGES_DIR="${ROOT_DIR}/images"
 IMAGE_JSON="${IMAGES_DIR}/image.json"
 INSTALLER_TEMPLATE="${ROOT_DIR}/install.sh"
 INSTALLER_BASENAME="prometheus-stack-installer"
-CHART_SRC_DIR="${ROOT_DIR}/charts/kube-prometheus-stack"
+CHART_OCI="oci://ghcr.io/prometheus-community/charts/kube-prometheus-stack"
 
 ARCH="amd64"
 PLATFORM="linux/amd64"
@@ -19,33 +22,24 @@ BUILD_ALL_ARCH="false"
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
 CYAN='\033[0;36m'
 NC='\033[0m'
 
-log() {
-  echo -e "${CYAN}[INFO]${NC} $*"
-}
+log() { echo -e "${CYAN}[INFO]${NC} $*"; }
+success() { echo -e "${GREEN}[OK]${NC} $*"; }
+die() { echo -e "${RED}[ERROR]${NC} $*" >&2; exit 1; }
 
-success() {
-  echo -e "${GREEN}[OK]${NC} $*"
-}
-
-die() {
-  echo -e "${RED}[ERROR]${NC} $*" >&2
-  exit 1
-}
-
-cleanup() {
-  rm -rf "${TEMP_DIR}"
-}
-
+cleanup() { rm -rf "${TEMP_DIR}"; }
 trap cleanup EXIT
 
 usage() {
-  cat <<'EOF'
+  cat <<EOF
 Usage:
   ./build.sh [--arch amd64|arm64|all]
+
+Build BOM:
+  installer                ${APP_VERSION}
+  kube-prometheus-stack    ${KUBE_PROMETHEUS_STACK_VERSION}
 
 Examples:
   ./build.sh --arch amd64
@@ -56,22 +50,10 @@ EOF
 
 normalize_arch() {
   case "$1" in
-    amd64|amd|x86_64)
-      ARCH="amd64"
-      PLATFORM="linux/amd64"
-      BUILD_ALL_ARCH="false"
-      ;;
-    arm64|arm|aarch64)
-      ARCH="arm64"
-      PLATFORM="linux/arm64"
-      BUILD_ALL_ARCH="false"
-      ;;
-    all)
-      BUILD_ALL_ARCH="true"
-      ;;
-    *)
-      die "Unsupported arch: $1"
-      ;;
+    amd64|amd|x86_64) ARCH="amd64"; PLATFORM="linux/amd64"; BUILD_ALL_ARCH="false" ;;
+    arm64|arm|aarch64) ARCH="arm64"; PLATFORM="linux/arm64"; BUILD_ALL_ARCH="false" ;;
+    all) BUILD_ALL_ARCH="true" ;;
+    *) die "Unsupported arch: $1" ;;
   esac
 }
 
@@ -83,13 +65,8 @@ parse_args() {
         normalize_arch "$2"
         shift 2
         ;;
-      -h|--help)
-        usage
-        exit 0
-        ;;
-      *)
-        die "Unknown argument: $1"
-        ;;
+      -h|--help) usage; exit 0 ;;
+      *) die "Unknown argument: $1" ;;
     esac
   done
 }
@@ -97,16 +74,35 @@ parse_args() {
 check_requirements() {
   command -v jq >/dev/null 2>&1 || die "jq is required"
   command -v docker >/dev/null 2>&1 || die "docker is required"
+  command -v helm >/dev/null 2>&1 || die "helm is required"
   command -v sha256sum >/dev/null 2>&1 || die "sha256sum is required"
   [[ -f "${INSTALLER_TEMPLATE}" ]] || die "install.sh is missing"
   [[ -f "${IMAGE_JSON}" ]] || die "images/image.json is missing"
-  [[ -d "${CHART_SRC_DIR}" ]] || die "charts/kube-prometheus-stack is missing"
+  [[ -f "${ROOT_DIR}/versions.env" ]] || die "versions.env is missing"
   grep -q '^__PAYLOAD_BELOW__$' "${INSTALLER_TEMPLATE}" || die "install.sh is missing __PAYLOAD_BELOW__ marker"
 }
 
 prepare_directories() {
   rm -rf "${TEMP_DIR}"
   mkdir -p "${PAYLOAD_DIR}/charts" "${PAYLOAD_DIR}/images" "${DIST_DIR}"
+}
+
+prepare_chart() {
+  log "Pulling kube-prometheus-stack ${KUBE_PROMETHEUS_STACK_VERSION}"
+  helm pull "${CHART_OCI}" \
+    --version "${KUBE_PROMETHEUS_STACK_VERSION}" \
+    --untar \
+    --untardir "${PAYLOAD_DIR}/charts"
+
+  local chart_file="${PAYLOAD_DIR}/charts/kube-prometheus-stack/Chart.yaml"
+  [[ -f "${chart_file}" ]] || die "Pulled chart is missing Chart.yaml"
+
+  local actual_version
+  actual_version="$(awk '$1=="version:" {print $2; exit}' "${chart_file}")"
+  [[ "${actual_version}" == "${KUBE_PROMETHEUS_STACK_VERSION}" ]] \
+    || die "Chart version mismatch: expected=${KUBE_PROMETHEUS_STACK_VERSION}, actual=${actual_version}"
+
+  success "Prepared kube-prometheus-stack ${actual_version}"
 }
 
 image_name_tag_from_ref() {
@@ -162,9 +158,6 @@ package_payload() {
   local installer_path="${DIST_DIR}/${INSTALLER_BASENAME}-${arch}.run"
   local checksum_path="${installer_path}.sha256"
 
-  log "Copying chart payload"
-  cp -R "${CHART_SRC_DIR}" "${PAYLOAD_DIR}/charts/"
-
   log "Creating payload archive"
   tar -C "${PAYLOAD_DIR}" -czf "${PAYLOAD_FILE}" .
   tar -tzf "${PAYLOAD_FILE}" >/dev/null
@@ -173,7 +166,10 @@ package_payload() {
   cat "${INSTALLER_TEMPLATE}" "${PAYLOAD_FILE}" > "${installer_path}"
   chmod +x "${installer_path}"
 
-  sha256sum "${installer_path}" | awk '{print $1}' > "${checksum_path}"
+  (
+    cd "${DIST_DIR}"
+    sha256sum "$(basename "${installer_path}")" > "$(basename "${checksum_path}")"
+  )
   success "Generated $(basename "${installer_path}")"
 }
 
@@ -196,6 +192,7 @@ build_one() {
   PLATFORM="${platform}"
 
   prepare_directories
+  prepare_chart
   prepare_images "${arch}" "${platform}"
   package_payload "${arch}"
   show_result "${arch}"
