@@ -72,9 +72,9 @@
   {
     "arch": "amd64",
     "platform": "linux/amd64",
-    "pull": "docker.io/grafana/grafana-image-renderer:5.10.3",
-    "tag": "sealos.hub:5000/kube4/grafana-image-renderer:5.10.3",
-    "tar": "grafana-image-renderer-5.10.3-amd64.tar"
+    "pull": "docker.io/grafana/grafana-image-renderer:v5.10.3",
+    "tag": "sealos.hub:5000/kube4/grafana-image-renderer:v5.10.3",
+    "tar": "grafana-image-renderer-v5.10.3-amd64.tar"
   },
   {
     "arch": "amd64",
@@ -177,9 +177,9 @@
   {
     "arch": "arm64",
     "platform": "linux/arm64",
-    "pull": "docker.io/grafana/grafana-image-renderer:5.10.3",
-    "tag": "sealos.hub:5000/kube4/grafana-image-renderer:5.10.3",
-    "tar": "grafana-image-renderer-5.10.3-arm64.tar"
+    "pull": "docker.io/grafana/grafana-image-renderer:v5.10.3",
+    "tag": "sealos.hub:5000/kube4/grafana-image-renderer:v5.10.3",
+    "tar": "grafana-image-renderer-v5.10.3-arm64.tar"
   },
   {
     "arch": "arm64",
