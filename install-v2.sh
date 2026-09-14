@@ -669,7 +669,7 @@ defaultRules:
 prometheusOperator:
   enabled: true
 prometheus:
-  enabled: false
+  enabled: true
 alertmanager:
   enabled: false
 grafana:

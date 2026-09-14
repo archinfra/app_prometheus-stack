@@ -93,9 +93,9 @@
   {
     "arch": "amd64",
     "platform": "linux/amd64",
-    "pull": "quay.io/prometheus/node-exporter:v1.12.1",
-    "tag": "sealos.hub:5000/kube4/node-exporter:v1.12.1",
-    "tar": "node-exporter-v1.12.1-amd64.tar"
+    "pull": "quay.io/prometheus/node-exporter:v1.12.1-distroless",
+    "tag": "sealos.hub:5000/kube4/node-exporter:v1.12.1-distroless",
+    "tar": "node-exporter-v1.12.1-distroless-amd64.tar"
   },
   {
     "arch": "amd64",
@@ -198,9 +198,9 @@
   {
     "arch": "arm64",
     "platform": "linux/arm64",
-    "pull": "quay.io/prometheus/node-exporter:v1.12.1",
-    "tag": "sealos.hub:5000/kube4/node-exporter:v1.12.1",
-    "tar": "node-exporter-v1.12.1-arm64.tar"
+    "pull": "quay.io/prometheus/node-exporter:v1.12.1-distroless",
+    "tag": "sealos.hub:5000/kube4/node-exporter:v1.12.1-distroless",
+    "tar": "node-exporter-v1.12.1-distroless-arm64.tar"
   },
   {
     "arch": "arm64",
