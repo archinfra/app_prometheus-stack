@@ -12,25 +12,50 @@ on:
       - ".github/workflows/build-offline-installer.yml"
       - "build.sh"
       - "install.sh"
+      - "versions.env"
       - "README.md"
       - "docs/**"
       - "images/**"
-      - "charts/**"
   pull_request:
     paths:
       - ".github/workflows/build-offline-installer.yml"
       - "build.sh"
       - "install.sh"
+      - "versions.env"
       - "README.md"
       - "docs/**"
       - "images/**"
-      - "charts/**"
 
 permissions:
   contents: write
 
 jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Shell syntax
+        run: bash -n build.sh install.sh
+
+      - name: Validate image metadata
+        run: |
+          jq empty images/image.json
+          test "$(jq '[.[] | select(.arch == "amd64")] | length' images/image.json)" -gt 0
+          test "$(jq '[.[] | select(.arch == "arm64")] | length' images/image.json)" -gt 0
+
+      - name: Validate installer help
+        run: |
+          chmod +x install.sh
+          ./install.sh --help | tee /tmp/help.txt
+          grep -q "kube-prometheus-stack.*90.2.0" /tmp/help.txt
+          grep -q -- "--values-file" /tmp/help.txt
+          grep -q -- "--stack-label-key" /tmp/help.txt
+          grep -q -- "--grafana-admin-user" /tmp/help.txt
+
   build:
+    needs: validate
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
@@ -49,11 +74,21 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: v3.19.0
+
       - name: Ensure executable permissions
         run: chmod +x build.sh install.sh
 
       - name: Build installer
         run: ./build.sh --arch "${{ matrix.arch }}"
+
+      - name: Verify checksum
+        run: |
+          cd dist
+          sha256sum -c "prometheus-stack-installer-${{ matrix.arch }}.run.sha256"
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
