@@ -2,211 +2,211 @@
   {
     "arch": "amd64",
     "platform": "linux/amd64",
-    "pull": "quay.io/prometheus/alertmanager:v0.30.1",
-    "tag": "sealos.hub:5000/kube4/alertmanager:v0.30.1",
-    "tar": "alertmanager-v0.30.1-amd64.tar"
-  },
-  {
-    "arch": "arm64",
-    "platform": "linux/arm64",
-    "pull": "quay.io/prometheus/alertmanager:v0.30.1",
-    "tag": "sealos.hub:5000/kube4/alertmanager:v0.30.1",
-    "tar": "alertmanager-v0.30.1-arm64.tar"
+    "pull": "quay.io/prometheus/alertmanager:v0.34.0",
+    "tag": "sealos.hub:5000/kube4/alertmanager:v0.34.0",
+    "tar": "alertmanager-v0.34.0-amd64.tar"
   },
   {
     "arch": "amd64",
     "platform": "linux/amd64",
-    "pull": "quay.io/prometheus-operator/admission-webhook:v0.88.1",
-    "tag": "sealos.hub:5000/kube4/admission-webhook:v0.88.1",
-    "tar": "admission-webhook-v0.88.1-amd64.tar"
-  },
-  {
-    "arch": "arm64",
-    "platform": "linux/arm64",
-    "pull": "quay.io/prometheus-operator/admission-webhook:v0.88.1",
-    "tag": "sealos.hub:5000/kube4/admission-webhook:v0.88.1",
-    "tar": "admission-webhook-v0.88.1-arm64.tar"
+    "pull": "quay.io/prometheus-operator/admission-webhook:v0.93.1",
+    "tag": "sealos.hub:5000/kube4/admission-webhook:v0.93.1",
+    "tar": "admission-webhook-v0.93.1-amd64.tar"
   },
   {
     "arch": "amd64",
     "platform": "linux/amd64",
-    "pull": "quay.io/prometheus-operator/prometheus-operator:v0.88.1",
-    "tag": "sealos.hub:5000/kube4/prometheus-operator:v0.88.1",
-    "tar": "prometheus-operator-v0.88.1-amd64.tar"
-  },
-  {
-    "arch": "arm64",
-    "platform": "linux/arm64",
-    "pull": "quay.io/prometheus-operator/prometheus-operator:v0.88.1",
-    "tag": "sealos.hub:5000/kube4/prometheus-operator:v0.88.1",
-    "tar": "prometheus-operator-v0.88.1-arm64.tar"
+    "pull": "quay.io/prometheus-operator/prometheus-operator:v0.93.1",
+    "tag": "sealos.hub:5000/kube4/prometheus-operator:v0.93.1",
+    "tar": "prometheus-operator-v0.93.1-amd64.tar"
   },
   {
     "arch": "amd64",
     "platform": "linux/amd64",
-    "pull": "quay.io/prometheus-operator/prometheus-config-reloader:v0.88.1",
-    "tag": "sealos.hub:5000/kube4/prometheus-config-reloader:v0.88.1",
-    "tar": "prometheus-config-reloader-v0.88.1-amd64.tar"
-  },
-  {
-    "arch": "arm64",
-    "platform": "linux/arm64",
-    "pull": "quay.io/prometheus-operator/prometheus-config-reloader:v0.88.1",
-    "tag": "sealos.hub:5000/kube4/prometheus-config-reloader:v0.88.1",
-    "tar": "prometheus-config-reloader-v0.88.1-arm64.tar"
+    "pull": "quay.io/prometheus-operator/prometheus-config-reloader:v0.93.1",
+    "tag": "sealos.hub:5000/kube4/prometheus-config-reloader:v0.93.1",
+    "tar": "prometheus-config-reloader-v0.93.1-amd64.tar"
   },
   {
     "arch": "amd64",
     "platform": "linux/amd64",
-    "pull": "quay.io/thanos/thanos:v0.40.1",
-    "tag": "sealos.hub:5000/kube4/thanos:v0.40.1",
-    "tar": "thanos-v0.40.1-amd64.tar"
-  },
-  {
-    "arch": "arm64",
-    "platform": "linux/arm64",
-    "pull": "quay.io/thanos/thanos:v0.40.1",
-    "tag": "sealos.hub:5000/kube4/thanos:v0.40.1",
-    "tar": "thanos-v0.40.1-arm64.tar"
+    "pull": "quay.io/thanos/thanos:v0.42.4",
+    "tag": "sealos.hub:5000/kube4/thanos:v0.42.4",
+    "tar": "thanos-v0.42.4-amd64.tar"
   },
   {
     "arch": "amd64",
     "platform": "linux/amd64",
-    "pull": "quay.io/prometheus/prometheus:v3.9.1",
-    "tag": "sealos.hub:5000/kube4/prometheus:v3.9.1",
-    "tar": "prometheus-v3.9.1-amd64.tar"
-  },
-  {
-    "arch": "arm64",
-    "platform": "linux/arm64",
-    "pull": "quay.io/prometheus/prometheus:v3.9.1",
-    "tag": "sealos.hub:5000/kube4/prometheus:v3.9.1",
-    "tar": "prometheus-v3.9.1-arm64.tar"
+    "pull": "quay.io/prometheus/prometheus:v3.14.0-distroless",
+    "tag": "sealos.hub:5000/kube4/prometheus:v3.14.0-distroless",
+    "tar": "prometheus-v3.14.0-distroless-amd64.tar"
   },
   {
     "arch": "amd64",
     "platform": "linux/amd64",
-    "pull": "docker.io/grafana/grafana:12.3.1",
-    "tag": "sealos.hub:5000/kube4/grafana:12.3.1",
-    "tar": "grafana-12.3.1-amd64.tar"
-  },
-  {
-    "arch": "arm64",
-    "platform": "linux/arm64",
-    "pull": "docker.io/grafana/grafana:12.3.1",
-    "tag": "sealos.hub:5000/kube4/grafana:12.3.1",
-    "tar": "grafana-12.3.1-arm64.tar"
+    "pull": "docker.io/grafana/grafana:13.2.1-distroless",
+    "tag": "sealos.hub:5000/kube4/grafana:13.2.1-distroless",
+    "tar": "grafana-13.2.1-distroless-amd64.tar"
   },
   {
     "arch": "amd64",
     "platform": "linux/amd64",
-    "pull": "docker.io/curlimages/curl:8.9.1",
-    "tag": "sealos.hub:5000/kube4/curl:8.9.1",
-    "tar": "curl-8.9.1-amd64.tar"
-  },
-  {
-    "arch": "arm64",
-    "platform": "linux/arm64",
-    "pull": "docker.io/curlimages/curl:8.9.1",
-    "tag": "sealos.hub:5000/kube4/curl:8.9.1",
-    "tar": "curl-8.9.1-arm64.tar"
+    "pull": "docker.io/curlimages/curl:8.22.0",
+    "tag": "sealos.hub:5000/kube4/curl:8.22.0",
+    "tar": "curl-8.22.0-amd64.tar"
   },
   {
     "arch": "amd64",
     "platform": "linux/amd64",
-    "pull": "docker.io/busybox:1.36.1",
-    "tag": "sealos.hub:5000/kube4/busybox:v1",
-    "tar": "busybox-v1-amd64.tar"
-  },
-  {
-    "arch": "arm64",
-    "platform": "linux/arm64",
-    "pull": "docker.io/busybox:1.36.1",
-    "tag": "sealos.hub:5000/kube4/busybox:v1",
-    "tar": "busybox-v1-arm64.tar"
+    "pull": "docker.io/library/busybox:1.38.0",
+    "tag": "sealos.hub:5000/kube4/busybox:1.38.0",
+    "tar": "busybox-1.38.0-amd64.tar"
   },
   {
     "arch": "amd64",
     "platform": "linux/amd64",
-    "pull": "docker.io/kiwigrid/k8s-sidecar:2.5.0",
-    "tag": "sealos.hub:5000/kube4/k8s-sidecar:2.5.0",
-    "tar": "k8s-sidecar-2.5.0-amd64.tar"
-  },
-  {
-    "arch": "arm64",
-    "platform": "linux/arm64",
-    "pull": "docker.io/kiwigrid/k8s-sidecar:2.5.0",
-    "tag": "sealos.hub:5000/kube4/k8s-sidecar:2.5.0",
-    "tar": "k8s-sidecar-2.5.0-arm64.tar"
+    "pull": "quay.io/kiwigrid/k8s-sidecar:2.11.2",
+    "tag": "sealos.hub:5000/kube4/k8s-sidecar:2.11.2",
+    "tar": "k8s-sidecar-2.11.2-amd64.tar"
   },
   {
     "arch": "amd64",
     "platform": "linux/amd64",
-    "pull": "docker.io/grafana/grafana-image-renderer:latest",
-    "tag": "sealos.hub:5000/kube4/grafana-image-renderer:latest",
-    "tar": "grafana-image-renderer-latest-amd64.tar"
-  },
-  {
-    "arch": "arm64",
-    "platform": "linux/arm64",
-    "pull": "docker.io/grafana/grafana-image-renderer:latest",
-    "tag": "sealos.hub:5000/kube4/grafana-image-renderer:latest",
-    "tar": "grafana-image-renderer-latest-arm64.tar"
+    "pull": "docker.io/grafana/grafana-image-renderer:v5.10.3",
+    "tag": "sealos.hub:5000/kube4/grafana-image-renderer:v5.10.3",
+    "tar": "grafana-image-renderer-v5.10.3-amd64.tar"
   },
   {
     "arch": "amd64",
     "platform": "linux/amd64",
-    "pull": "quay.io/brancz/kube-rbac-proxy:v0.20.2",
-    "tag": "sealos.hub:5000/kube4/kube-rbac-proxy:v0.20.2",
-    "tar": "kube-rbac-proxy-v0.20.2-amd64.tar"
-  },
-  {
-    "arch": "arm64",
-    "platform": "linux/arm64",
-    "pull": "quay.io/brancz/kube-rbac-proxy:v0.20.2",
-    "tag": "sealos.hub:5000/kube4/kube-rbac-proxy:v0.20.2",
-    "tar": "kube-rbac-proxy-v0.20.2-arm64.tar"
+    "pull": "quay.io/brancz/kube-rbac-proxy:v0.22.1",
+    "tag": "sealos.hub:5000/kube4/kube-rbac-proxy:v0.22.1",
+    "tar": "kube-rbac-proxy-v0.22.1-amd64.tar"
   },
   {
     "arch": "amd64",
     "platform": "linux/amd64",
-    "pull": "registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.18.0",
-    "tag": "sealos.hub:5000/kube4/kube-state-metrics:v2.18.0",
-    "tar": "kube-state-metrics-v2.18.0-amd64.tar"
-  },
-  {
-    "arch": "arm64",
-    "platform": "linux/arm64",
-    "pull": "registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.18.0",
-    "tag": "sealos.hub:5000/kube4/kube-state-metrics:v2.18.0",
-    "tar": "kube-state-metrics-v2.18.0-arm64.tar"
+    "pull": "registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.20.0",
+    "tag": "sealos.hub:5000/kube4/kube-state-metrics:v2.20.0",
+    "tar": "kube-state-metrics-v2.20.0-amd64.tar"
   },
   {
     "arch": "amd64",
     "platform": "linux/amd64",
-    "pull": "quay.io/prometheus/node-exporter:v1.10.2",
-    "tag": "sealos.hub:5000/kube4/node-exporter:v1.10.2",
-    "tar": "node-exporter-v1.10.2-amd64.tar"
-  },
-  {
-    "arch": "arm64",
-    "platform": "linux/arm64",
-    "pull": "quay.io/prometheus/node-exporter:v1.10.2",
-    "tag": "sealos.hub:5000/kube4/node-exporter:v1.10.2",
-    "tar": "node-exporter-v1.10.2-arm64.tar"
+    "pull": "quay.io/prometheus/node-exporter:v1.12.1",
+    "tag": "sealos.hub:5000/kube4/node-exporter:v1.12.1",
+    "tar": "node-exporter-v1.12.1-amd64.tar"
   },
   {
     "arch": "amd64",
     "platform": "linux/amd64",
-    "pull": "ghcr.io/jkroepke/kube-webhook-certgen:1.7.4",
-    "tag": "sealos.hub:5000/kube4/kube-webhook-certgen:1.7.4",
-    "tar": "kube-webhook-certgen-1.7.4-amd64.tar"
+    "pull": "ghcr.io/jkroepke/kube-webhook-certgen:1.8.8",
+    "tag": "sealos.hub:5000/kube4/kube-webhook-certgen:1.8.8",
+    "tar": "kube-webhook-certgen-1.8.8-amd64.tar"
   },
   {
     "arch": "arm64",
     "platform": "linux/arm64",
-    "pull": "ghcr.io/jkroepke/kube-webhook-certgen:1.7.4",
-    "tag": "sealos.hub:5000/kube4/kube-webhook-certgen:1.7.4",
-    "tar": "kube-webhook-certgen-1.7.4-arm64.tar"
+    "pull": "quay.io/prometheus/alertmanager:v0.34.0",
+    "tag": "sealos.hub:5000/kube4/alertmanager:v0.34.0",
+    "tar": "alertmanager-v0.34.0-arm64.tar"
+  },
+  {
+    "arch": "arm64",
+    "platform": "linux/arm64",
+    "pull": "quay.io/prometheus-operator/admission-webhook:v0.93.1",
+    "tag": "sealos.hub:5000/kube4/admission-webhook:v0.93.1",
+    "tar": "admission-webhook-v0.93.1-arm64.tar"
+  },
+  {
+    "arch": "arm64",
+    "platform": "linux/arm64",
+    "pull": "quay.io/prometheus-operator/prometheus-operator:v0.93.1",
+    "tag": "sealos.hub:5000/kube4/prometheus-operator:v0.93.1",
+    "tar": "prometheus-operator-v0.93.1-arm64.tar"
+  },
+  {
+    "arch": "arm64",
+    "platform": "linux/arm64",
+    "pull": "quay.io/prometheus-operator/prometheus-config-reloader:v0.93.1",
+    "tag": "sealos.hub:5000/kube4/prometheus-config-reloader:v0.93.1",
+    "tar": "prometheus-config-reloader-v0.93.1-arm64.tar"
+  },
+  {
+    "arch": "arm64",
+    "platform": "linux/arm64",
+    "pull": "quay.io/thanos/thanos:v0.42.4",
+    "tag": "sealos.hub:5000/kube4/thanos:v0.42.4",
+    "tar": "thanos-v0.42.4-arm64.tar"
+  },
+  {
+    "arch": "arm64",
+    "platform": "linux/arm64",
+    "pull": "quay.io/prometheus/prometheus:v3.14.0-distroless",
+    "tag": "sealos.hub:5000/kube4/prometheus:v3.14.0-distroless",
+    "tar": "prometheus-v3.14.0-distroless-arm64.tar"
+  },
+  {
+    "arch": "arm64",
+    "platform": "linux/arm64",
+    "pull": "docker.io/grafana/grafana:13.2.1-distroless",
+    "tag": "sealos.hub:5000/kube4/grafana:13.2.1-distroless",
+    "tar": "grafana-13.2.1-distroless-arm64.tar"
+  },
+  {
+    "arch": "arm64",
+    "platform": "linux/arm64",
+    "pull": "docker.io/curlimages/curl:8.22.0",
+    "tag": "sealos.hub:5000/kube4/curl:8.22.0",
+    "tar": "curl-8.22.0-arm64.tar"
+  },
+  {
+    "arch": "arm64",
+    "platform": "linux/arm64",
+    "pull": "docker.io/library/busybox:1.38.0",
+    "tag": "sealos.hub:5000/kube4/busybox:1.38.0",
+    "tar": "busybox-1.38.0-arm64.tar"
+  },
+  {
+    "arch": "arm64",
+    "platform": "linux/arm64",
+    "pull": "quay.io/kiwigrid/k8s-sidecar:2.11.2",
+    "tag": "sealos.hub:5000/kube4/k8s-sidecar:2.11.2",
+    "tar": "k8s-sidecar-2.11.2-arm64.tar"
+  },
+  {
+    "arch": "arm64",
+    "platform": "linux/arm64",
+    "pull": "docker.io/grafana/grafana-image-renderer:v5.10.3",
+    "tag": "sealos.hub:5000/kube4/grafana-image-renderer:v5.10.3",
+    "tar": "grafana-image-renderer-v5.10.3-arm64.tar"
+  },
+  {
+    "arch": "arm64",
+    "platform": "linux/arm64",
+    "pull": "quay.io/brancz/kube-rbac-proxy:v0.22.1",
+    "tag": "sealos.hub:5000/kube4/kube-rbac-proxy:v0.22.1",
+    "tar": "kube-rbac-proxy-v0.22.1-arm64.tar"
+  },
+  {
+    "arch": "arm64",
+    "platform": "linux/arm64",
+    "pull": "registry.k8s.io/kube-state-metrics/kube-state-metrics:v2.20.0",
+    "tag": "sealos.hub:5000/kube4/kube-state-metrics:v2.20.0",
+    "tar": "kube-state-metrics-v2.20.0-arm64.tar"
+  },
+  {
+    "arch": "arm64",
+    "platform": "linux/arm64",
+    "pull": "quay.io/prometheus/node-exporter:v1.12.1",
+    "tag": "sealos.hub:5000/kube4/node-exporter:v1.12.1",
+    "tar": "node-exporter-v1.12.1-arm64.tar"
+  },
+  {
+    "arch": "arm64",
+    "platform": "linux/arm64",
+    "pull": "ghcr.io/jkroepke/kube-webhook-certgen:1.8.8",
+    "tag": "sealos.hub:5000/kube4/kube-webhook-certgen:1.8.8",
+    "tar": "kube-webhook-certgen-1.8.8-arm64.tar"
   }
 ]
