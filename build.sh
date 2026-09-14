@@ -84,7 +84,7 @@ check_requirements() {
 
 prepare_directories() {
   rm -rf "${TEMP_DIR}"
-  mkdir -p "${PAYLOAD_DIR}/charts" "${PAYLOAD_DIR}/images" "${DIST_DIR}"
+  mkdir -p "${PAYLOAD_DIR}/charts" "${PAYLOAD_DIR}/images" "${PAYLOAD_DIR}/crds" "${DIST_DIR}"
 }
 
 prepare_chart() {
@@ -102,7 +102,32 @@ prepare_chart() {
   [[ "${actual_version}" == "${KUBE_PROMETHEUS_STACK_VERSION}" ]] \
     || die "Chart version mismatch: expected=${KUBE_PROMETHEUS_STACK_VERSION}, actual=${actual_version}"
 
+  helm lint "${PAYLOAD_DIR}/charts/kube-prometheus-stack" >/dev/null
   success "Prepared kube-prometheus-stack ${actual_version}"
+}
+
+prepare_crds() {
+  local chart_root="${PAYLOAD_DIR}/charts/kube-prometheus-stack"
+  local unpacked_crd_dir="${chart_root}/charts/crds/crds"
+  local source_dir=""
+
+  if [[ -d "${unpacked_crd_dir}" ]]; then
+    source_dir="${unpacked_crd_dir}"
+  else
+    local crd_archive
+    crd_archive="$(find "${chart_root}/charts" -maxdepth 1 -type f -name 'crds-*.tgz' -print -quit)"
+    [[ -n "${crd_archive}" ]] || die "Unable to locate CRD subchart in pulled chart"
+
+    local extract_dir="${TEMP_DIR}/crds-subchart"
+    mkdir -p "${extract_dir}"
+    tar -xzf "${crd_archive}" -C "${extract_dir}"
+    source_dir="${extract_dir}/crds/crds"
+  fi
+
+  [[ -d "${source_dir}" ]] || die "Unable to locate CRD manifests"
+  cp "${source_dir}"/*.yaml "${PAYLOAD_DIR}/crds/"
+  compgen -G "${PAYLOAD_DIR}/crds/*.yaml" >/dev/null || die "No CRD manifests were copied"
+  success "Prepared bundled CRD manifests"
 }
 
 image_name_tag_from_ref() {
@@ -193,6 +218,7 @@ build_one() {
 
   prepare_directories
   prepare_chart
+  prepare_crds
   prepare_images "${arch}" "${platform}"
   package_payload "${arch}"
   show_result "${arch}"
