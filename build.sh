@@ -12,7 +12,7 @@ PAYLOAD_FILE="${TEMP_DIR}/payload.tar.gz"
 DIST_DIR="${ROOT_DIR}/dist"
 IMAGES_DIR="${ROOT_DIR}/images"
 IMAGE_JSON="${IMAGES_DIR}/image.json"
-INSTALLER_TEMPLATE="${ROOT_DIR}/install.sh"
+INSTALLER_TEMPLATE="${ROOT_DIR}/install-v2.sh"
 INSTALLER_BASENAME="prometheus-stack-installer"
 CHART_OCI="oci://ghcr.io/prometheus-community/charts/kube-prometheus-stack"
 
@@ -76,10 +76,10 @@ check_requirements() {
   command -v docker >/dev/null 2>&1 || die "docker is required"
   command -v helm >/dev/null 2>&1 || die "helm is required"
   command -v sha256sum >/dev/null 2>&1 || die "sha256sum is required"
-  [[ -f "${INSTALLER_TEMPLATE}" ]] || die "install.sh is missing"
+  [[ -f "${INSTALLER_TEMPLATE}" ]] || die "install-v2.sh is missing"
   [[ -f "${IMAGE_JSON}" ]] || die "images/image.json is missing"
   [[ -f "${ROOT_DIR}/versions.env" ]] || die "versions.env is missing"
-  grep -q '^__PAYLOAD_BELOW__$' "${INSTALLER_TEMPLATE}" || die "install.sh is missing __PAYLOAD_BELOW__ marker"
+  grep -q '^__PAYLOAD_BELOW__$' "${INSTALLER_TEMPLATE}" || die "install-v2.sh is missing __PAYLOAD_BELOW__ marker"
 }
 
 prepare_directories() {
