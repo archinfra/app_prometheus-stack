@@ -98,7 +98,7 @@ prepare_chart() {
   [[ -f "${chart_file}" ]] || die "Pulled chart is missing Chart.yaml"
 
   local actual_version
-  actual_version="$(awk '$1=="version:" {print $2; exit}' "${chart_file}")"
+  actual_version="$(awk '/^version:/ {print $2; exit}' "${chart_file}")"
   [[ "${actual_version}" == "${KUBE_PROMETHEUS_STACK_VERSION}" ]] \
     || die "Chart version mismatch: expected=${KUBE_PROMETHEUS_STACK_VERSION}, actual=${actual_version}"
 
