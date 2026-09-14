@@ -18,7 +18,7 @@ Release target: `app_prometheus-stack v0.2.0`
 | k8s-sidecar | 2.11.2 |
 | kube-rbac-proxy | 0.22.1 |
 | kube-webhook-certgen | 1.8.8 |
-| Grafana image renderer | 5.10.3 |
+| Grafana image renderer | v5.10.3 |
 
 ## Build model
 
@@ -28,7 +28,7 @@ embeds it into the `.run` package, and verifies the chart version before packagi
 
 ## Upgrade behavior
 
-- First install: phase 1 installs CRDs/operator, phase 2 installs the complete stack.
+- First install: bundled CRDs are applied first, phase 1 installs the operator, and phase 2 installs the complete stack.
 - Existing Helm release: bundled CRDs are applied with server-side apply, then a single full-stack Helm upgrade is executed.
 - `--skip-crd-upgrade` is available for controlled exception cases.
 
