@@ -381,6 +381,12 @@ prepare_images() {
     [[ "$load_ref" == "$target_ref" ]] || docker tag "$load_ref" "$target_ref"
     log "Pushing ${target_ref}"
     docker push "$target_ref" >/dev/null
+    if [[ "${tar_name}" == *node-exporter* ]]; then
+      local dist="${target_ref}-distroless"
+      log "Pushing node-exporter -distroless tag ${dist}"
+      docker tag "${target_ref}" "${dist}" >/dev/null 2>&1 || true
+      docker push "${dist}" >/dev/null 2>&1 || true
+    fi
   done < "$IMAGE_INDEX"
 }
 
